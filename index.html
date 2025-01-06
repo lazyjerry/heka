@@ -28,30 +28,24 @@
             background: linear-gradient(90deg, #fec5e5, #b3f4d8, #b3d4f4);
         
         }
-        body,
-        html {
-/*             touch-action: manipulation;
-            overscroll-behavior-y: contain;
-            overscroll-behavior-x: contain; */
-        }
-
         /*
-      為了電腦版(橫向螢幕)也能完整呈現名片，
-      並保持長寬比例一致，新增兩個媒體查詢：
-      - 螢幕 寬/高 >= 664/1129 (較寬): 以高度為主
-      - 否則(較窄): 以寬度為主
-    */
+            為了電腦版(橫向螢幕)也能完整呈現名片，
+            並保持長寬比例一致，新增兩個媒體查詢：
+          - 螢幕 寬/高 >= 664/1129 (較寬): 以高度為主
+          - 否則(較窄): 以寬度為主
+        */
         @media (min-aspect-ratio: 664/1129) {
             .card-container {
                 width: auto;
                 height: 90vh;
+                max-height: 1129px;
             }
         }
 
         @media (max-aspect-ratio: 664/1129) {
             .card-container {
                 width: 70vw;
-/*                 min-width: 300px; */
+                max-width: 664px;
                 height: auto;
             }
         }
