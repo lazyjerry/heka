@@ -18,7 +18,7 @@
 
         /* 背景：線性漸層 */
         body {
-            min-height: 100vh;
+            height: 100vh;
             overflow: hidden;
             /* 或 auto，看需求 */
             display: flex;
@@ -26,6 +26,8 @@
             justify-content: center;
             font-family: sans-serif;
             background: linear-gradient(90deg, #fec5e5, #b3f4d8, #b3d4f4);
+            overscroll-behavior-y: contain;
+            overscroll-behavior-x: contain;
         }
 
         /*
@@ -43,7 +45,8 @@
 
         @media (max-aspect-ratio: 664/1129) {
             .card-container {
-                width: 90vw;
+                width: 70vw;
+                min-width: 300px;
                 height: auto;
             }
         }
@@ -228,34 +231,15 @@
 
         // 手指事件：單指翻轉、雙指縮放
         function onTouchStart(e) {
-            if (e.touches.length === 1) {
-                const t = e.touches[0];
-                startFlip(t.clientX, t.clientY);
-            } else if (e.touches.length === 2) {
-                isDragging = false;
-                flipDirection = null;
-                pinchStartDist = getDistance(e.touches[0], e.touches[1]);
-                card.style.transition = "";
-            }
+            const t = e.touches[0];
+            startFlip(t.clientX, t.clientY);
+
         }
 
         function onTouchMove(e) {
-            if (e.touches.length === 1 && isDragging) {
-                const t = e.touches[0];
-                moveFlip(t.clientX, t.clientY);
-            } else if (e.touches.length === 2) {
-                const dist = getDistance(e.touches[0], e.touches[1]);
-                let scaleChange = dist / pinchStartDist;
-                let newScale = currentScale * scaleChange;
-                newScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, newScale));
-                if (flipDirection === 'horizontal') {
-                    card.style.transform = `rotateY(${currentAngle}deg) scale(${newScale})`;
-                } else if (flipDirection === 'vertical') {
-                    card.style.transform = `rotateX(${currentAngle}deg) scale(${newScale})`;
-                } else {
-                    card.style.transform = `scale(${newScale})`;
-                }
-            }
+            const t = e.touches[0];
+            moveFlip(t.clientX, t.clientY);
+
         }
 
         function onTouchEnd(e) {
