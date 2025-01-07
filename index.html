@@ -26,9 +26,9 @@
             justify-content: center;
             font-family: sans-serif;
             background: linear-gradient(90deg, #fec5e5, #b3f4d8, #b3d4f4);
-        
+
         }
-            
+
         body,
         html {
             /*touch-action: manipulation;
@@ -54,7 +54,6 @@
             .card-container {
                 width: auto;
                 height: 90vh;
-
             }
         }
 
@@ -125,11 +124,7 @@
             </div>
         </div>
         <script>
-        /*********************************************
-         * 名片翻轉 + 雙指縮放 (Pinch Zoom) 邏輯
-         *********************************************/
         const card = document.getElementById('businessCard');
-        const backSide = document.getElementById('backSide');
 
         let isDragging = false;
         let startX = 0,
@@ -139,23 +134,13 @@
         const threshold = 90;
 
         /* 縮放相關變數 */
-        let currentScale = 1; // 目前縮放比例
-        const MIN_SCALE = 0.5,
-            MAX_SCALE = 2.5;
-        let pinchStartDist = 0; // 兩指起始距離
+        let currentScale = 0.8; // 目前縮放比例
 
         /*
           加入 isOnBack，用來判斷「卡片已水平翻到背面」。
           若翻到背面後上下滑動，就轉成上下顛倒。
         */
         let isOnBack = false; // 是否已翻到背面 (水平)
-
-        // 計算兩指距離
-        function getDistance(t1, t2) {
-            const dx = t1.clientX - t2.clientX;
-            const dy = t1.clientY - t2.clientY;
-            return Math.sqrt(dx * dx + dy * dy);
-        }
 
         // 初始化翻轉
         function startFlip(x, y) {
@@ -171,72 +156,50 @@
             const deltaX = x - startX;
             const deltaY = y - startY;
 
-            /*
-              (a) 若已在背面且先前是水平翻 (isOnBack = true)，
-                  一旦偵測到「明顯上下拖動」，就改成上下翻轉，
-                  讓背面上下顛倒 (不再幫 .back 做 rotateX(180deg) 校正)。
-            */
-            if (isOnBack && !flipDirection) {
-                if (Math.abs(deltaY) > Math.abs(deltaX) && Math.abs(deltaY) > 10) {
-                    flipDirection = 'vertical';
-                    // 這裡移除原先的 backSide.style.transform = 'rotateX(180deg)';
-                    // 不做任何校正 => 最終會上下顛倒
-                    backSide.style.transform = '';
-                }
-            }
 
-            // (b) 若尚未決定翻方向 (flipDirection=null)，用原邏輯判斷
             if (!flipDirection) {
                 if (Math.abs(deltaX) > Math.abs(deltaY)) {
                     flipDirection = 'horizontal';
-                    backSide.style.transform = 'rotateY(180deg)';
                 } else {
                     flipDirection = 'vertical';
-                    // 同樣註解掉，避免背面自動校正
-                    // backSide.style.transform = 'rotateX(180deg)';
-                    backSide.style.transform = '';
                 }
             }
 
-            // (c) 計算旋轉角度
+            // console.log("deltaX", deltaX);
+            let rScale = 0.1;
             if (flipDirection === 'horizontal') {
-                currentAngle = deltaX * 0.5;
-                currentAngle = Math.max(-180, Math.min(180, currentAngle));
+                delta = deltaX * (isOnBack ? 1 : 1);
+                currentAngle = currentAngle + delta * rScale;
                 card.style.transform = `rotateY(${currentAngle}deg) scale(${currentScale})`;
             } else {
-                currentAngle = -deltaY * 0.5;
-                currentAngle = Math.max(-180, Math.min(180, currentAngle));
+                delta = deltaY * (isOnBack ? -1 : 1);
+                currentAngle = currentAngle + -delta * rScale;
                 card.style.transform = `rotateX(${currentAngle}deg) scale(${currentScale})`;
             }
+            console.log("card.style.transform", card.style.transform);
         }
 
         // 結束翻轉
         function endFlip() {
             isDragging = false;
-            if (Math.abs(currentAngle) > threshold) {
-                currentAngle = currentAngle > 0 ? 180 : -180;
-            } else {
-                currentAngle = 0;
-            }
-            card.style.transition = "transform 0.5s ease";
-
+            let diff = currentAngle % 180;
+            currentAngle = currentAngle > 0 ? currentAngle + (180 - diff) : currentAngle - diff;
+            // card.style.transition = "transform 0.5s ease";
             if (flipDirection === 'horizontal') {
                 card.style.transform = `rotateY(${currentAngle}deg) scale(${currentScale})`;
                 // 水平翻到 ±180 => 背面朝上
-                isOnBack = (Math.abs(currentAngle) === 180);
             } else if (flipDirection === 'vertical') {
                 card.style.transform = `rotateX(${currentAngle}deg) scale(${currentScale})`;
-                // 垂直翻 ±180 => 背面上下顛倒 (但不再設定 isOnBack)
-                isOnBack = false;
+                // 垂直翻 ±180 => 背面上下顛倒
             }
-
-            // 完成動畫後移除 transition
-            setTimeout(() => {
-                card.style.transition = "";
-            }, 500);
+            isOnBack = (Math.abs(currentAngle / 180) % 2 === 1);
+            console.log("isOnBack", isOnBack);
+            // // 完成動畫後移除 transition
+            // setTimeout(() => {
+            // card.style.transition = "";
+            // }, 500);
         }
-
-        // 手指事件：單指翻轉、雙指縮放
+        // 手指事件：單指翻轉
         function onTouchStart(e) {
             const t = e.touches[0];
             startFlip(t.clientX, t.clientY);
@@ -254,13 +217,6 @@
                 // 所有手指離開
                 if (isDragging) {
                     endFlip();
-                } else {
-                    // 結束縮放：記錄當前縮放
-                    const transformValue = card.style.transform;
-                    const match = transformValue.match(/scale\(([\d.]+)\)/);
-                    if (match) {
-                        currentScale = parseFloat(match[1]);
-                    }
                 }
             }
         }
@@ -286,6 +242,17 @@
                 endFlip();
             }
             mouseDown = false;
+        });
+
+        window.addEventListener('load', () => {
+            card.style.transition = "transform 1s ease";
+            card.style.transform = `rotateY(720deg) scale(${currentScale})`;
+
+            // 等待旋轉完成後，回到初始狀態
+            setTimeout(() => {
+                card.style.transition = "transform 1s ease";
+                card.style.transform = `rotateY(0deg) scale(${currentScale})`;
+            }, 1000);
         });
         </script>
     </body>
