@@ -168,12 +168,12 @@
             // console.log("deltaX", deltaX);
             let rScale = 0.1;
             if (flipDirection === 'horizontal') {
-                delta = deltaX * (isOnBack ? 1 : 1);
+                delta = deltaX;
                 currentAngle = currentAngle + delta * rScale;
                 card.style.transform = `rotateY(${currentAngle}deg) scale(${currentScale})`;
             } else {
-                delta = deltaY * (isOnBack ? -1 : 1);
-                currentAngle = currentAngle + -delta * rScale;
+                delta = deltaY;
+                currentAngle = currentAngle - delta * rScale;
                 card.style.transform = `rotateX(${currentAngle}deg) scale(${currentScale})`;
             }
             console.log("card.style.transform", card.style.transform);
