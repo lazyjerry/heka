@@ -169,20 +169,24 @@ function endDrag() {
         if (lastAngle >= MAX_ANGLE) {
             // 往右翻
             doDoubleX(!isReverse ? 'right' : 'left');
+            doFlipAnimation();
             return;
         } else if (lastAngle <= -MAX_ANGLE) {
             // 往左翻
             doDoubleX(!isReverse ? 'left' : 'right');
+            doFlipAnimation();
             return;
         }
     } else { // vertical
         if (lastAngle >= MAX_ANGLE) {
             // 往下翻 (您可以自行決定要 += 540 還是 -= 540)
-            doDoubleX('down');
+            doDoubleX('up');
+            doFlipAnimation();
             return;
         } else if (lastAngle <= -MAX_ANGLE) {
             // 往上翻
-            doDoubleX('up');
+            doDoubleX('down');
+            doFlipAnimation();
             return;
         }
     }
