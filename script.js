@@ -275,14 +275,14 @@ function doFlipAnimation() {
 
     // 1.2秒 (0.8 + 0.4) 後，整個動畫結束，再做角度校正
 
-    // setTimeout(() => {
-    //     angleX = normalizeAngle(angleX);
-    //     angleY = normalizeAngle(angleY);
-    //
-    //     // 重新套用一次「校正後」的角度，避免下一次翻轉時跳動
-    //     card.style.transition = 'none'; // 先取消過渡效果
-    //     card.style.transform = `rotateX(${angleX}deg) rotateY(${angleY}deg) scale(${currentScale})`;
-    // }, 1200);
+    setTimeout(() => {
+        angleX = normalizeAngle(angleX);
+        angleY = normalizeAngle(angleY);
+
+        // 重新套用一次「校正後」的角度，避免下一次翻轉時跳動
+        card.style.transition = 'none'; // 先取消過渡效果
+        card.style.transform = `rotateX(${angleX}deg) rotateY(${angleY}deg) scale(${currentScale})`;
+    }, 1200);
 }
 
 /**
