@@ -23,7 +23,7 @@ let card, toastMsg;
 
 let isFirst = true;
 const FIRST_ANGLE = -720.001;
-let isBack = false;
+let isReverse = false;
 
 window.addEventListener('load', () => {
     // 從 HTML DOM 抓元素
@@ -211,13 +211,13 @@ function onDoubleX(clickX, clickY) {
         doDoubleX('up');
     } else if (clickY < lineAVal && clickY >= lineBVal) {
         // 右方區塊 => angleY += 540
-        doDoubleX(!isBack ? 'right' : 'left');
+        doDoubleX(!isReverse ? 'right' : 'left');
     } else if (clickY >= lineAVal && clickY >= lineBVal) {
         // 下方區塊 => angleX += 540 (或 -= 540 視需求)
         doDoubleX('down');
     } else {
         // 左方區塊 => angleY -= 540
-        doDoubleX(!isBack ? 'left' : 'right');
+        doDoubleX(!isReverse ? 'left' : 'right');
     }
     doFlipAnimation();
 }
@@ -274,9 +274,7 @@ function doFlipAnimation() {
         angleX = normalizeAngle(angleX);
         angleY = normalizeAngle(angleY);
 
-        if (Math.abs(angleX % 360) == 180 || Math.abs(angleY % 360) == 180) {
-            isBack = true;
-        }
+        isReverse = (Math.abs(angleX % 360) == 180 );
 
         // 重新套用一次「校正後」的角度，避免下一次翻轉時跳動
         card.style.transition = 'none'; // 先取消過渡效果
