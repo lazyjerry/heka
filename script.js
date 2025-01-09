@@ -211,13 +211,13 @@ function onDoubleX(clickX, clickY) {
         doDoubleX('up');
     } else if (clickY < lineAVal && clickY >= lineBVal) {
         // 右方區塊 => angleY += 540
-        doDoubleX(isBack ? 'right' : 'left');
+        doDoubleX(!isBack ? 'right' : 'left');
     } else if (clickY >= lineAVal && clickY >= lineBVal) {
         // 下方區塊 => angleX += 540 (或 -= 540 視需求)
         doDoubleX('down');
     } else {
         // 左方區塊 => angleY -= 540
-        doDoubleX(isBack ? 'left' : 'right');
+        doDoubleX(!isBack ? 'left' : 'right');
     }
 
     console.log("angleX", angleX);
