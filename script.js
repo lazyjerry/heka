@@ -168,25 +168,21 @@ function endDrag() {
     if (flipMode === 'horizontal') {
         if (lastAngle >= MAX_ANGLE) {
             // 往右翻
-            angleY += 540; // 或 720/1080 等自行決定
-            doFlipAnimation();
+            doDoubleX(!isReverse ? 'right' : 'left');
             return;
         } else if (lastAngle <= -MAX_ANGLE) {
             // 往左翻
-            angleY -= 540;
-            doFlipAnimation();
+            doDoubleX(!isReverse ? 'left' : 'right');
             return;
         }
     } else { // vertical
         if (lastAngle >= MAX_ANGLE) {
             // 往下翻 (您可以自行決定要 += 540 還是 -= 540)
-            angleX += 540;
-            doFlipAnimation();
+            doDoubleX('down');
             return;
         } else if (lastAngle <= -MAX_ANGLE) {
             // 往上翻
-            angleX -= 540;
-            doFlipAnimation();
+            doDoubleX('up');
             return;
         }
     }
