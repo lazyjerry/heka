@@ -21,6 +21,10 @@ const currentScale = 0.8; // 卡片縮放比例
 /* DOM 變數 (load 完再抓) */
 let card, toastMsg;
 
+let isFirst = true;
+const FIRST_ANGLE = -720.001;
+let isBack = false;
+
 window.addEventListener('load', () => {
     // 從 HTML DOM 抓元素
     card = document.getElementById('businessCard');
@@ -54,8 +58,8 @@ function initEvents() {
     // 1. 拖曳 (滑鼠 + 手指)
     // ==========================
     // 手指
-    card.addEventListener('touchstart', onTouchStart, { passive: true });
-    card.addEventListener('touchmove', onTouchMove, { passive: false });
+    card.addEventListener('touchstart', onTouchStart, {passive: true});
+    card.addEventListener('touchmove', onTouchMove, {passive: false});
     card.addEventListener('touchend', onTouchEnd);
 
     // 滑鼠
@@ -140,7 +144,7 @@ function moveDrag(x, y) {
         // 左右翻轉 => 改變 angleY
         let newAngle = deltaX * 0.3; // 比例
         // 限制 -MAX_ANGLE ~ MAX_ANGLE
-        if (newAngle >  MAX_ANGLE) newAngle =  MAX_ANGLE;
+        if (newAngle > MAX_ANGLE) newAngle = MAX_ANGLE;
         if (newAngle < -MAX_ANGLE) newAngle = -MAX_ANGLE;
         // 即時顯示
         card.style.transform = `rotateX(${angleX}deg) rotateY(${angleY + newAngle}deg) scale(${currentScale})`;
@@ -148,7 +152,7 @@ function moveDrag(x, y) {
     } else {
         // 上下翻轉 => 改變 angleX (往上翻 => angleX 負值)
         let newAngle = -deltaY * 0.3;
-        if (newAngle >  MAX_ANGLE) newAngle =  MAX_ANGLE;
+        if (newAngle > MAX_ANGLE) newAngle = MAX_ANGLE;
         if (newAngle < -MAX_ANGLE) newAngle = -MAX_ANGLE;
         card.style.transform = `rotateX(${angleX + newAngle}deg) rotateY(${angleY}deg) scale(${currentScale})`;
         lastAngle = newAngle;
@@ -191,8 +195,7 @@ function endDrag() {
     card.style.transition = 'transform 0.5s ease';
     card.style.transform = `rotateX(${angleX}deg) rotateY(${angleY}deg) scale(${currentScale})`;
 }
-let isFirst = true;
-const FIRST_ANGLE = -720.001;
+
 /* ============== 雙擊：以「X 型」分成四區 ============== */
 function onDoubleX(clickX, clickY) {
     const w = window.innerWidth;
@@ -206,55 +209,49 @@ function onDoubleX(clickX, clickY) {
     if (clickY < lineAVal && clickY < lineBVal) {
         // 上方區塊 => angleX -= 540 (或 += 540 視需求)
         doDoubleX('up');
-    }
-    else if (clickY < lineAVal && clickY >= lineBVal) {
+    } else if (clickY < lineAVal && clickY >= lineBVal) {
         // 右方區塊 => angleY += 540
-        doDoubleX('right');
-    }
-    else if (clickY >= lineAVal && clickY >= lineBVal) {
+        doDoubleX(isBack ? 'right' : 'left');
+    } else if (clickY >= lineAVal && clickY >= lineBVal) {
         // 下方區塊 => angleX += 540 (或 -= 540 視需求)
         doDoubleX('down');
-    }
-    else {
+    } else {
         // 左方區塊 => angleY -= 540
-        doDoubleX('left');
+        doDoubleX(isBack ? 'left' : 'right');
     }
 
-    console.log("angleX",angleX);
-    console.log("angleY",angleY);
+    console.log("angleX", angleX);
+    console.log("angleY", angleY);
     doFlipAnimation();
 }
 
-function doDoubleX(direction){
+function doDoubleX(direction) {
     // 分四區 (上、右、下、左)
     if ('up' == direction) {
         // 上方區塊 => angleX -= 540 (或 += 540 視需求)
         angleX += 540;
-        if(isFirst){
+        if (isFirst) {
             angleX += FIRST_ANGLE;
             isFirst = false;
         }
-    }
-    else if ('right' == direction) {
+    } else if ('right' == direction) {
         // 右方區塊 => angleY += 540
         angleY += 540;
-        if(isFirst){
+        if (isFirst) {
             angleY += FIRST_ANGLE;
             isFirst = false;
         }
-    }
-    else if ('down' == direction) {
+    } else if ('down' == direction) {
         // 下方區塊 => angleX += 540 (或 -= 540 視需求)
         angleX -= 540;
-        if(isFirst){
+        if (isFirst) {
             angleX -= FIRST_ANGLE;
             isFirst = false;
         }
-    }
-    else {
+    } else {
         // 左方區塊 => angleY -= 540
         angleY -= 540;
-        if(isFirst){
+        if (isFirst) {
             angleY -= FIRST_ANGLE;
             isFirst = false;
         }
@@ -278,6 +275,10 @@ function doFlipAnimation() {
     setTimeout(() => {
         angleX = normalizeAngle(angleX);
         angleY = normalizeAngle(angleY);
+
+        if (Math.abs(angleX % 360) == 180 || Math.abs(angleY % 360) == 180) {
+            isBack = true;
+        }
 
         // 重新套用一次「校正後」的角度，避免下一次翻轉時跳動
         card.style.transition = 'none'; // 先取消過渡效果
