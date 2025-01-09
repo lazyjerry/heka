@@ -219,13 +219,11 @@ function onDoubleX(clickX, clickY) {
         // 左方區塊 => angleY -= 540
         doDoubleX(!isBack ? 'left' : 'right');
     }
-
-    console.log("angleX", angleX);
-    console.log("angleY", angleY);
     doFlipAnimation();
 }
 
 function doDoubleX(direction) {
+    console.log("direction", direction);
     // 分四區 (上、右、下、左)
     if ('up' == direction) {
         // 上方區塊 => angleX -= 540 (或 += 540 視需求)
